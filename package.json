@@ -1,0 +1,13 @@
+{
+  "name": "simple-pipeline",
+  "version": "1.0.0",
+  "main": "calculator.js",
+  "scripts": {
+    "test": "node calculator.test.js"
+  },
+  "keywords": [],
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

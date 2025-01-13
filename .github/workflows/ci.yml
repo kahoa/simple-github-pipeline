@@ -9,8 +9,8 @@ on:
       - main  # Trigger workflow on pull requests to the 'main' branch
 
 jobs:
-  # Job 1: Checkout, Install Dependencies, and Run Tests
-  run-tests:
+  # Job 1: Checkout and Install Dependencies
+  install-dependencies:
     runs-on: ubuntu-latest
     steps:
       # Step 1: Checkout code
@@ -20,17 +20,35 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Specify the version of Node.js
+          node-version: '22'  # Specify the version of Node.js
       # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+  # Job 2: Run Tests (depends on the install-dependencies job)
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: install-dependencies  # This job depends on the install-dependencies job
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v2
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'  # Specify the version of Node.js
+      # Step 3: Install dependencies (needed for tests)
       - name: Install dependencies
         run: npm install
       # Step 4: Run tests
       - name: Run tests
         run: npm test
 
-  # Job 2: Checkout, Install Dependencies, and Deploy
+  # Job 3: Deploy (depends on the run-tests job)
   deploy:
     runs-on: ubuntu-latest
+    needs: run-tests  # This job depends on the run-tests job
     steps:
       # Step 1: Checkout code
       - name: Checkout code
@@ -39,11 +57,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Specify the version of Node.js
-      # Step 3: Install dependencies
+          node-version: '22'  # Specify the version of Node.js
+      # Step 3: Install dependencies (needed for deployment, e.g., for building the app)
       - name: Install dependencies
         run: npm install
-      # Step 4: Deploy (this is just an echo for demonstration)
+      # Step 4: Deploy Application (this is just an echo for demonstration)
       - name: Deploy Application
         run: |
           echo "Deployment successful! (This is just an echo for demonstration)"
